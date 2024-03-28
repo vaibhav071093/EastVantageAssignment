@@ -1,10 +1,17 @@
-from typing import List, Optional
-from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
-from geopy.distance import geodesic
-from sqlalchemy import create_engine, Column, Integer, String, Float
-from sqlalchemy.ext.declarative import declarative_base
+from fastapi import FastAPI
+from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-# Initialize FastAPI
+from database import Base, engine
+from api import router as api_router
+
 app = FastAPI()
+
+# Create tables
+Base.metadata.create_all(bind=engine)
+
+# Dependency for database session
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+# Include API routes
+app.include_router(api_router)
